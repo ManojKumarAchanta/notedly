@@ -1,0 +1,35 @@
+### GET request
+GET https://localhost:3000/api/signup
+Accept: application/json
+
+### POST request with JSON
+POST http://localhost:5000/api/signup
+Content-Type: application/json
+
+{
+  "username": "test",
+  "email": "test@gmail.com",
+  "password": "test123"
+}
+
+### POST request with JSON
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
+  "email": "test@gmail.com",
+  "password": "test123"
+}
+### PUT request
+PUT https://jsonplaceholder.typicode.com/posts/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "updated title",
+  "body": "updated body",
+  "userId": 1
+}
+
+### DELETE request
+DELETE https://jsonplaceholder.typicode.com/posts/1

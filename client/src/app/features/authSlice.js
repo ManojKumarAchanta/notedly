@@ -2,7 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   token: localStorage.getItem("token") || null,
-  user: null,
+  user: localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null, // Parse user info from localStorage
+  // Check if token exists to determine authentication status
   isAuthenticated: !!localStorage.getItem("token"), // Convert to boolean
 };
 
@@ -16,6 +19,7 @@ const authSlice = createSlice({
       state.user = user;
       state.isAuthenticated = true; // Set to true when credentials are set
       localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user)); // Store user info in localStorage
     },
     logout: (state) => {
       state.token = null;

@@ -137,7 +137,7 @@ export const archiveUnarchiveNote = async (req, res) => {
       message: `Note ${
         note.isArchived ? "archived" : "unarchived"
       } successfully`,
-      note,
+      isArchived: note.isArchived,
     });
   } catch (err) {
     console.error("Archive note error:", err);

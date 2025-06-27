@@ -1,6 +1,7 @@
 import { setCredentials } from "@/app/features/authSlice"
 import { useLoginMutation } from "@/app/services/authApi"
 import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
 import {
     Card,
     CardContent,
@@ -66,13 +67,12 @@ function Login({ onSwitchToSignup }) {
                             <span className="text-sm text-muted-foreground">
                                 Don&apos;t have an account?{" "}
                             </span>
-                            <Button
-                                variant="link"
+                            <Link
                                 className="p-0 h-auto font-normal text-sm"
-                                onClick={onSwitchToSignup}
+                                to="/auth/signup"
                             >
                                 Sign Up
-                            </Button>
+                            </Link>
                         </div>
                     </CardHeader>
                     <CardContent>

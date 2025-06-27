@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { selectCurrentUser } from "@/app/features/authSlice";
 import { useSelector } from "react-redux";
 import { WandSparkles } from "lucide-react";
+import Attachments from "./Attatchments";
 
 function cleanModelOutput(dirtyHtml) {
     return dirtyHtml
@@ -212,245 +213,253 @@ export default function EditNoteForm({ noteId }) {
     }
 
     return (
-        <div className="w-full mx-auto py-4 md:px-6 max-w-6xl">
-            {/* Header with metadata */}
-            <Card className="mb-6">
-                <CardHeader>
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <CardTitle className="text-2xl md:text-4xl font-bold">
-                                Edit Your Note
-                            </CardTitle>
-                            <p className="text-sm md:text-lg text-muted-foreground mt-2">
-                                Update your thoughts and ideas — refine your creativity and make it even better.
-                            </p>
-                        </div>
-
-                        {/* Metadata */}
-                        {noteData && (
-                            <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                                <div className="flex items-center gap-2">
-                                    <UserIcon className="w-4 h-4" />
-                                    <span>Author: {user?.username || 'User'}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <CalendarIcon className="w-4 h-4" />
-                                    <span>Created: {formatDate(noteData.createdAt)}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <CalendarIcon className="w-4 h-4" />
-                                    <span>Updated: {formatDate(noteData.updatedAt)}</span>
-                                </div>
-                                {noteData.isPinned && (
-                                    <Badge variant="secondary" className="w-fit">
-                                        📌 Pinned
-                                    </Badge>
-                                )}
-                                {noteData.isArchived && (
-                                    <Badge variant="outline" className="w-fit">
-                                        📁 Archived
-                                    </Badge>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </CardHeader>
-            </Card>
-
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Main Content Area */}
-                <div className="lg:col-span-3">
-                    {/* Title Input */}
-                    <div className="mb-4 flex items-center gap-[5%] justify-between">
-                        <Input
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Enter note title..."
-                            className="text-lg font-semibold flex-1"
-                            required
-                        />
-                        <div className="flex gap-2">
-                            <Button
-                                onClick={handleEnhanceNoteWithAI}
-                                className="px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base transition-colors duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={isEnhancing}
-                                variant="outline"
-                            >
-                                {isEnhancing ? (
-                                    <span className="flex items-center gap-1 sm:gap-2">
-                                        <LoaderCircle className="animate-spin w-4 h-4 sm:w-5 sm:h-5" />
-                                        <span className="hidden sm:inline">Enhancing...</span>
-                                    </span>
-                                ) : (
-                                    <span className="flex items-center gap-1 sm:gap-2">
-                                        <WandSparkles className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        <span className="hidden sm:inline">Enhance with AI</span>
-                                        <span className="sm:hidden">AI</span>
-                                    </span>
-                                )}
-                            </Button>
-                            <Button
-                                onClick={handleUpdateNote}
-                                disabled={isUpdating}
-                                size="sm"
-                            >
-                                {isUpdating ? (
-                                    <>
-                                        <LoaderCircle className="animate-spin w-4 h-4 mr-2" />
-                                        <span className="hidden sm:inline">Updating...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="hidden sm:inline mr-2">Update Note</span>
-                                        <SaveIcon className="w-4 h-4" />
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* Editor Container */}
-                    <div className="flex w-full gap-2 items-center justify-center">
-                        <div className="w-full">
-                            <Editor
-                                onInit={(evt, editor) => editorRef.current = editor}
-                                value={content}
-                                onEditorChange={(newContent) => setContent(newContent)}
-                                className="w-full min-h-[500px] border rounded-lg"
-                                apiKey="1dwskg2xqhe1uvn9k3g9ub5wc846os2qz5kidgkj6xbzmiwm"
-                                init={{
-                                    height: window.innerWidth < 640 ? 500 : window.innerWidth < 768 ? 600 : 720,
-                                    toolbar: window.innerWidth < 640
-                                        ? "undo redo | bold italic | link | numlist bullist"
-                                        : "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
-                                    promotion: false,
-                                    branding: false,
-                                    onboarding: false,
-                                    skin: 'oxide',
-                                    content_css: 'default',
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Sidebar */}
-                <div className="lg:col-span-1">
-                    <div className="space-y-6">
-                        {/* Tags Section */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-lg">
-                                    <TagIcon className="w-5 h-5" />
-                                    Tags
+        <div className="grid grid-cols-1 md:grid-cols-[75%_25%] w-full ">
+            <div className="flex flex-col py-4 md:px-2 ">
+                <Card className="mb-6">
+                    <CardHeader>
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <CardTitle className="text-2xl md:text-4xl font-bold">
+                                    Edit Your Note
                                 </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {/* Add Tag Input */}
-                                <div className="flex gap-2">
-                                    <Input
-                                        type="text"
-                                        value={newTag}
-                                        onChange={(e) => setNewTag(e.target.value)}
-                                        onKeyPress={handleTagInputKeyPress}
-                                        placeholder="Add a tag..."
-                                        className="flex-1"
-                                    />
-                                    <Button
-                                        onClick={handleAddTag}
-                                        size="sm"
-                                        variant="outline"
-                                        disabled={!newTag.trim()}
-                                    >
-                                        <PlusIcon className="w-4 h-4" />
-                                    </Button>
-                                </div>
+                                <p className="text-sm md:text-lg text-muted-foreground mt-2">
+                                    Update your thoughts and ideas — refine your creativity and make it even better.
+                                </p>
+                            </div>
 
-                                {/* Existing Tags */}
-                                <div className="flex flex-wrap gap-2">
-                                    {tags.map((tag, index) => (
-                                        <Badge
-                                            key={index}
-                                            variant="secondary"
-                                            className="flex items-center gap-1 px-2 py-1"
-                                        >
-                                            <span>{tag}</span>
-                                            <Button
-                                                onClick={() => handleRemoveTag(tag)}
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-auto p-0 ml-1"
-                                            >
-                                                <XIcon className="w-3 h-3" />
-                                            </Button>
+                            {/* Metadata */}
+                            {noteData && (
+                                <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                                    <div className="flex items-center gap-2">
+                                        <UserIcon className="w-4 h-4" />
+                                        <span>Author: {user?.username || 'User'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <CalendarIcon className="w-4 h-4" />
+                                        <span>Created: {formatDate(noteData.createdAt)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <CalendarIcon className="w-4 h-4" />
+                                        <span>Updated: {formatDate(noteData.updatedAt)}</span>
+                                    </div>
+                                    {noteData.isPinned && (
+                                        <Badge variant="secondary" className="w-fit">
+                                            📌 Pinned
                                         </Badge>
-                                    ))}
+                                    )}
+                                    {noteData.isArchived && (
+                                        <Badge variant="outline" className="w-fit">
+                                            📁 Archived
+                                        </Badge>
+                                    )}
                                 </div>
+                            )}
+                        </div>
+                    </CardHeader>
+                </Card>
+                {/* Header with metadata */}
 
-                                {tags.length === 0 && (
-                                    <p className="text-sm text-muted-foreground">
-                                        No tags added yet. Add some tags to organize your note!
-                                    </p>
-                                )}
-                            </CardContent>
-                        </Card>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Main Content Area */}
+                    <div className="lg:col-span-3">
+                        {/* Title Input */}
+                        <div className="mb-4 flex items-center gap-[5%] justify-between">
+                            <Input
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="Enter note title..."
+                                className="text-lg font-semibold flex-1"
+                                required
+                            />
+                            <div className="flex gap-2">
+                                <Button
+                                    onClick={handleEnhanceNoteWithAI}
+                                    className="px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base transition-colors duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={isEnhancing}
+                                    variant="outline"
+                                >
+                                    {isEnhancing ? (
+                                        <span className="flex items-center gap-1 sm:gap-2">
+                                            <LoaderCircle className="animate-spin w-4 h-4 sm:w-5 sm:h-5" />
+                                            <span className="hidden sm:inline">Enhancing...</span>
+                                        </span>
+                                    ) : (
+                                        <span className="flex items-center gap-1 sm:gap-2">
+                                            <WandSparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+                                            <span className="hidden sm:inline">Enhance with AI</span>
+                                            <span className="sm:hidden">AI</span>
+                                        </span>
+                                    )}
+                                </Button>
+                                <Button
+                                    onClick={handleUpdateNote}
+                                    disabled={isUpdating}
+                                    size="sm"
+                                >
+                                    {isUpdating ? (
+                                        <>
+                                            <LoaderCircle className="animate-spin w-4 h-4 mr-2" />
+                                            <span className="hidden sm:inline">Updating...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="hidden sm:inline mr-2">Update Note</span>
+                                            <SaveIcon className="w-4 h-4" />
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
 
-                        {/* Color Picker */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Note Color</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex flex-wrap gap-2">
-                                    {['#ffffff', '#fef3c7', '#ddd6fe', '#fce7f3', '#d1fae5', '#fecaca', '#fed7aa'].map((colorOption) => (
-                                        <button
-                                            key={colorOption}
-                                            onClick={() => setColor(colorOption)}
-                                            className={`w-8 h-8 rounded-full border-2 ${color === colorOption ? 'border-gray-800' : 'border-gray-300'
-                                                }`}
-                                            style={{ backgroundColor: colorOption }}
-                                        />
-                                    ))}
-                                </div>
-                                <Input
-                                    type="color"
-                                    value={color}
-                                    onChange={(e) => setColor(e.target.value)}
-                                    className="mt-2 w-full h-10"
+                        {/* Editor Container */}
+                        <div className="flex w-full gap-2 items-center justify-center">
+                            <div className="w-full">
+                                <Editor
+                                    onInit={(evt, editor) => editorRef.current = editor}
+                                    value={content}
+                                    onEditorChange={(newContent) => setContent(newContent)}
+                                    className="w-full min-h-[500px] border rounded-lg"
+                                    apiKey="1dwskg2xqhe1uvn9k3g9ub5wc846os2qz5kidgkj6xbzmiwm"
+                                    init={{
+                                        height: window.innerWidth < 640 ? 500 : window.innerWidth < 768 ? 600 : 720,
+                                        toolbar: window.innerWidth < 640
+                                            ? "undo redo | bold italic | link | numlist bullist"
+                                            : "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
+                                        promotion: false,
+                                        branding: false,
+                                        onboarding: false,
+                                        skin: 'oxide',
+                                        content_css: 'default',
+                                    }}
                                 />
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
+                    </div>
 
-                        {/* Note Stats */}
-                        {noteData && (
+                    {/* Sidebar */}
+                    <div className="lg:col-span-1">
+                        <div className="space-y-6">
+                            {/* Tags Section */}
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="text-lg">Note Statistics</CardTitle>
+                                    <CardTitle className="flex items-center gap-2 text-lg">
+                                        <TagIcon className="w-5 h-5" />
+                                        Tags
+                                    </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                        <span>Characters:</span>
-                                        <span>{content.length}</span>
+                                <CardContent className="space-y-4">
+                                    {/* Add Tag Input */}
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="text"
+                                            value={newTag}
+                                            onChange={(e) => setNewTag(e.target.value)}
+                                            onKeyPress={handleTagInputKeyPress}
+                                            placeholder="Add a tag..."
+                                            className="flex-1"
+                                        />
+                                        <Button
+                                            onClick={handleAddTag}
+                                            size="sm"
+                                            variant="outline"
+                                            disabled={!newTag.trim()}
+                                        >
+                                            <PlusIcon className="w-4 h-4" />
+                                        </Button>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span>Words:</span>
-                                        <span>{content.split(/\s+/).filter(word => word.length > 0).length}</span>
+
+                                    {/* Existing Tags */}
+                                    <div className="flex flex-wrap gap-2">
+                                        {tags.map((tag, index) => (
+                                            <Badge
+                                                key={index}
+                                                variant="secondary"
+                                                className="flex items-center gap-1 px-2 py-1"
+                                            >
+                                                <span>{tag}</span>
+                                                <Button
+                                                    onClick={() => handleRemoveTag(tag)}
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-auto p-0 ml-1"
+                                                >
+                                                    <XIcon className="w-3 h-3" />
+                                                </Button>
+                                            </Badge>
+                                        ))}
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span>Tags:</span>
-                                        <span>{tags.length}</span>
-                                    </div>
-                                    <Separator />
-                                    <div className="flex justify-between">
-                                        <span>Note ID:</span>
-                                        <span className="text-xs font-mono">{noteData._id}</span>
-                                    </div>
+
+                                    {tags.length === 0 && (
+                                        <p className="text-sm text-muted-foreground">
+                                            No tags added yet. Add some tags to organize your note!
+                                        </p>
+                                    )}
                                 </CardContent>
                             </Card>
-                        )}
+
+                            {/* Color Picker */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-lg">Note Color</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['#ffffff', '#fef3c7', '#ddd6fe', '#fce7f3', '#d1fae5', '#fecaca', '#fed7aa'].map((colorOption) => (
+                                            <button
+                                                key={colorOption}
+                                                onClick={() => setColor(colorOption)}
+                                                className={`w-8 h-8 rounded-full border-2 ${color === colorOption ? 'border-gray-800' : 'border-gray-300'
+                                                    }`}
+                                                style={{ backgroundColor: colorOption }}
+                                            />
+                                        ))}
+                                    </div>
+                                    <Input
+                                        type="color"
+                                        value={color}
+                                        onChange={(e) => setColor(e.target.value)}
+                                        className="mt-2 w-full h-10"
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            {/* Note Stats */}
+                            {noteData && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="text-lg">Note Statistics</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span>Characters:</span>
+                                            <span>{content.length}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Words:</span>
+                                            <span>{content.split(/\s+/).filter(word => word.length > 0).length}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Tags:</span>
+                                            <span>{tags.length}</span>
+                                        </div>
+                                        <Separator />
+                                        <div className="flex justify-between">
+                                            <span>Note ID:</span>
+                                            <span className="text-xs font-mono">{noteData._id}</span>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div className="">
+                <Attachments
+                    noteId={noteId}
+                    attachments={noteData?.attachments || []}
+                />
             </div>
         </div>
     );

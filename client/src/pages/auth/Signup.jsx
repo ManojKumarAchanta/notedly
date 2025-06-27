@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
+import { Link } from "react-router-dom";
+import { LoaderCircle } from "lucide-react";
 
 function Signup({ onSwitchToLogin }) {
     const [formData, setFormData] = useState({
@@ -62,13 +63,12 @@ function Signup({ onSwitchToLogin }) {
                             <span className="text-sm text-muted-foreground">
                                 Already have an account?{" "}
                             </span>
-                            <Button
-                                variant="link"
+                            <Link
+                                to="/auth/login"
                                 className="p-0 h-auto font-normal text-sm"
-                                onClick={onSwitchToLogin}
                             >
                                 Login
-                            </Button>
+                            </Link>
                         </div>
                     </CardHeader>
                     <CardContent>

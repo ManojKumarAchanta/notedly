@@ -3,13 +3,20 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const notesApi = createApi({
   reducerPath: "notesApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://notedly-4ml6.onrender.com/api/note",
-    // baseUrl: "http://localhost:8000/api/note",
-    prepareHeaders: (headers) => {
+    // baseUrl: "https://notedly-4ml6.onrender.com/api/note",
+    baseUrl: "http://localhost:8000/api/note",
+    prepareHeaders: (headers, { endpoint }) => {
       const token = localStorage.getItem("token");
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
+
+      // Don't set Content-Type for FormData endpoints - let browser set it with boundary
+      const formDataEndpoints = ["createNote", "updateNote", "addAttachments"];
+      if (!formDataEndpoints.includes(endpoint)) {
+        headers.set("Content-Type", "application/json");
+      }
+
       return headers;
     },
   }),
@@ -53,22 +60,68 @@ export const notesApi = createApi({
     }),
 
     createNote: builder.mutation({
-      query: (note) => ({
-        url: "/create",
-        method: "POST",
-        body: note,
-      }),
+      query: (noteData) => {
+        // If noteData is FormData (has files), send as is
+        if (noteData instanceof FormData) {
+          return {
+            url: "/create",
+            method: "POST",
+            body: noteData,
+          };
+        }
+        // Otherwise, send as JSON
+        return {
+          url: "/create",
+          method: "POST",
+          body: noteData,
+        };
+      },
       invalidatesTags: ["Note"],
     }),
 
     updateNote: builder.mutation({
-      query: ({ id, ...note }) => ({
-        url: `/update/${id}`,
-        method: "PUT",
-        body: note,
+      query: ({ id, ...noteData }) => {
+        // Check if noteData is FormData or contains files
+        if (noteData instanceof FormData) {
+          return {
+            url: `/update/${id}`,
+            method: "PUT",
+            body: noteData,
+          };
+        }
+        // Otherwise, send as JSON
+        return {
+          url: `/update/${id}`,
+          method: "PUT",
+          body: noteData,
+        };
+      },
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Note", id },
+        "Note",
+      ],
+    }),
+
+    // New attachment-specific endpoints
+    addAttachments: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/${id}/attachments`,
+        method: "POST",
+        body: formData, // FormData with files
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: "Note", id },
+        "Note",
+      ],
+    }),
+
+    removeAttachment: builder.mutation({
+      query: ({ noteId, attachmentIndex }) => ({
+        url: `/${noteId}/attachments/${attachmentIndex}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, { noteId }) => [
+        { type: "Note", id: noteId },
         "Note",
       ],
     }),
@@ -89,6 +142,7 @@ export const notesApi = createApi({
       }),
       invalidatesTags: ["Note"],
     }),
+
     enhanceNoteWithAI: builder.mutation({
       query: (note) => ({
         url: "/enhance",
@@ -112,4 +166,7 @@ export const {
   useTogglePinMutation, // Changed from Query to Mutation
   useGetArchivesQuery,
   useDeleteManyNotesMutation,
+  // New attachment hooks
+  useAddAttachmentsMutation,
+  useRemoveAttachmentMutation,
 } = notesApi;

@@ -7,6 +7,121 @@ dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+import cloudinary from "../config/cloudinary.js";
+
+export const createNote = async (req, res) => {
+  try {
+    const { title, content, tags, isPinned, isArchived, color } = req.body;
+    console.log(req.user.userId);
+
+    const newNote = new Note({
+      userId: req.user.userId,
+      title,
+      content,
+      tags,
+      isPinned,
+      isArchived,
+      color,
+    });
+
+    // Handle file uploads if they exist
+    if (req.files && req.files.length > 0) {
+      newNote.attachments = req.files.map((file) => ({
+        filename: file.originalname,
+        url: file.path, // Cloudinary URL
+        size: file.size,
+        mimeType: file.mimetype,
+      }));
+    }
+
+    await newNote.save();
+    res.status(201).json(newNote);
+  } catch (err) {
+    console.error("Create note error:", err);
+    res.status(500).json({ error: "Failed to create note" });
+  }
+};
+
+export const updateNote = async (req, res) => {
+  try {
+    const noteId = req.params.id;
+    const updates = req.body;
+
+    // Find the existing note first to handle file deletions if needed
+    const existingNote = await Note.findOne({
+      _id: noteId,
+      userId: req.user.userId,
+    });
+    if (!existingNote) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+
+    // Handle new file uploads
+    if (req.files && req.files.length > 0) {
+      const newAttachments = req.files.map((file) => ({
+        filename: file.originalname,
+        url: file.path, // Cloudinary URL
+        size: file.size,
+        mimeType: file.mimetype,
+      }));
+
+      // If you want to replace all attachments, use this:
+      updates.attachments = newAttachments;
+
+      // If you want to append new attachments to existing ones, use this instead:
+      // updates.attachments = [...(existingNote.attachments || []), ...newAttachments];
+    }
+
+    const updated = await Note.findOneAndUpdate(
+      { _id: noteId, userId: req.user.userId },
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+
+    res.json(updated);
+  } catch (err) {
+    console.error("Update note error:", err);
+    res.status(500).json({ error: "Failed to update note" });
+  }
+};
+
+// Optional: Function to remove specific attachments
+export const removeAttachment = async (req, res) => {
+  try {
+    const { noteId, attachmentIndex } = req.params;
+
+    const note = await Note.findOne({ _id: noteId, userId: req.user.userId });
+    if (!note) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+
+    if (!note.attachments || attachmentIndex >= note.attachments.length) {
+      return res.status(404).json({ error: "Attachment not found" });
+    }
+
+    const attachment = note.attachments[attachmentIndex];
+
+    // Delete from Cloudinary
+    try {
+      const publicId = attachment.url.split("/").pop().split(".")[0];
+      const fullPublicId = `easynotes/${publicId}`;
+      await cloudinary.uploader.destroy(fullPublicId);
+    } catch (error) {
+      console.error("Error deleting file from Cloudinary:", error);
+    }
+
+    // Remove from database
+    note.attachments.splice(attachmentIndex, 1);
+    note.updatedAt = new Date();
+    await note.save();
+
+    res.json(note);
+  } catch (err) {
+    console.error("Remove attachment error:", err);
+    res.status(500).json({ error: "Failed to remove attachment" });
+  }
+};
+
 export const enhanceNoteWithAI = async (req, res) => {
   const { note } = req.body;
 
@@ -52,37 +167,6 @@ ${note}
   } catch (error) {
     console.error("Gemini Error:", error.message);
     res.status(500).json({ error: "Failed to sanitize note.", error });
-  }
-};
-
-export const createNote = async (req, res) => {
-  try {
-    const { title, content, tags, isPinned, isArchived, color } = req.body;
-    console.log(req.user.userId);
-    const newNote = new Note({
-      userId: req.user.userId,
-      title,
-      content,
-      tags,
-      isPinned,
-      isArchived,
-      color,
-    });
-
-    if (req.files && req.files.length > 0) {
-      newNote.attatchments = req.files.map((file) => ({
-        filename: file.originalname,
-        url: file.path,
-        size: file.size,
-        mimeType: file.mimetype,
-      }));
-    }
-
-    await newNote.save();
-    res.status(201).json(newNote);
-  } catch (err) {
-    console.error("Create note error:", err);
-    res.status(500).json({ error: "Failed to create note" });
   }
 };
 
@@ -205,25 +289,6 @@ export const getNotes = async (req, res) => {
   }
 };
 
-export const updateNote = async (req, res) => {
-  try {
-    const noteId = req.params.id;
-    const updates = req.body;
-
-    const updated = await Note.findOneAndUpdate(
-      { _id: noteId, userId: req.user.userId },
-      { ...updates, updatedAt: new Date() },
-      { new: true }
-    );
-
-    if (!updated) return res.status(404).json({ error: "Note not found" });
-
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update note" });
-  }
-};
-
 export const deleteNote = async (req, res) => {
   try {
     const noteId = req.params.id;
@@ -238,5 +303,37 @@ export const deleteNote = async (req, res) => {
     res.json({ message: "Note deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete note" });
+  }
+};
+// Add this to your note.controller.js
+export const addAttachments = async (req, res) => {
+  try {
+    const noteId = req.params.id;
+    
+    const note = await Note.findOne({ _id: noteId, userId: req.user.userId });
+    if (!note) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "No files provided" });
+    }
+
+    const newAttachments = req.files.map((file) => ({
+      filename: file.originalname,
+      url: file.path, // Cloudinary URL
+      size: file.size,
+      mimeType: file.mimetype,
+    }));
+
+    // Add new attachments to existing ones
+    note.attachments = [...(note.attachments || []), ...newAttachments];
+    note.updatedAt = new Date();
+    
+    await note.save();
+    res.json(note);
+  } catch (err) {
+    console.error("Add attachments error:", err);
+    res.status(500).json({ error: "Failed to add attachments" });
   }
 };

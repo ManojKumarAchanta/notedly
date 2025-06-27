@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import { useRef, useEffect } from "react";
 import { SaveIcon, CalendarIcon, UserIcon, TagIcon, XIcon, PlusIcon } from "lucide-react";
 import { LoaderCircle } from "lucide-react";
-import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +34,6 @@ export default function EditNoteForm({ noteId }) {
     const [newTag, setNewTag] = useState("");
     const [color, setColor] = useState("#ffffff");
     const editorRef = useRef(null);
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     if (!noteId) {
         console.error("Note ID is not provided in the URL.");
@@ -163,7 +161,6 @@ export default function EditNoteForm({ noteId }) {
             }).unwrap();
 
             toast.success("Note updated successfully!");
-            dispatch(setActiveView("list"));
 
         } catch (error) {
             console.error("Error updating note:", error);

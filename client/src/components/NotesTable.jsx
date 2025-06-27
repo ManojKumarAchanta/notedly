@@ -541,7 +541,11 @@ export default function NotesTable() {
                                     <TableCell className="text-xs text-muted-foreground hidden lg:table-cell py-2">
                                         {note.createdAt ? new Date(note.createdAt).toLocaleDateString('en-US', {
                                             month: 'short',
-                                            day: 'numeric'
+                                            day: 'numeric',
+                                            timeZone: 'UTC',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true,
                                         }) : '—'}
                                     </TableCell>
 

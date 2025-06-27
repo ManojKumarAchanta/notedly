@@ -18,13 +18,16 @@ function Signup({ onSwitchToLogin }) {
     })
 
     const [signup, { isLoading }] = useSignupMutation();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         // Basic validation
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords don't match!")
-            return
+            toast.error("Passwords don't match!");
+            return;
         }
+
         const sanitizedData = {
             email: formData.email,
             password: formData.password,
@@ -34,26 +37,26 @@ function Signup({ onSwitchToLogin }) {
         try {
             await signup(sanitizedData).unwrap();
             toast.success('Signup successful! Please login to continue.');
-            onSwitchToLogin(); // Switch to login after successful signup
         } catch (err) {
-            toast.error('Signup failed. Please try again.');
-            // Optionally log the error for debugging
+            // Extract error message properly
+            let errorMessage = err;
+
+            toast.error(errorMessage.message);
             console.error('Signup failed:', err);
         }
     };
-
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen bg-background flex item-center text-foreground">
+        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen bg-background flex items-center text-foreground">
             {/* Left Side */}
-
             <LeftSide />
+
             <div className="flex items-center justify-center w-full min-h-screen p-4">
-                <Card className="w-full max-w-md ">
+                <Card className="w-full max-w-md">
                     <CardHeader className="text-center">
                         <CardTitle className="text-2xl">Welcome to Notedly</CardTitle>
                         <CardDescription>
@@ -65,14 +68,14 @@ function Signup({ onSwitchToLogin }) {
                             </span>
                             <Link
                                 to="/auth/login"
-                                className="p-0 h-auto font-normal text-sm"
+                                className="p-0 h-auto font-normal text-sm text-primary hover:underline"
                             >
                                 Login
                             </Link>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="flex flex-col gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="username">Username</Label>
@@ -124,18 +127,23 @@ function Signup({ onSwitchToLogin }) {
                                 </div>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Button onClick={handleSubmit} className="w-full">
-                                    {!isLoading ? "Create Account" : <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                                <Button type="submit" className="w-full" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                            Creating Account...
+                                        </>
+                                    ) : (
+                                        "Create Account"
+                                    )}
                                 </Button>
                             </div>
-                        </div>
+                        </form>
                     </CardContent>
                 </Card>
             </div>
         </div>
-
     )
 }
 
-// Main component to switch between Login and Signup
 export default Signup;

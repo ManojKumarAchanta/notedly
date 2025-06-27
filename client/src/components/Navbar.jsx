@@ -1,224 +1,125 @@
-import { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
-import { Menu, X, FileText, Archive, Tag, User, LogOut, ChevronLeft, ChevronRight } from "lucide-react"
-import { ModeToggle } from "./mode-toggle.jsx"
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "./ui/sheet.jsx"
-import { Button } from "./ui/button.jsx"
-import { Link } from 'react-router-dom'
-import { isAuthenticated, logout } from "../app/features/authSlice.js"
+import React, { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { Menu, X, Home, FileText, Plus, Settings } from 'lucide-react'
 
-export default function Navbar() {
-    const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false)
-    const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false)
-    const [isMobile, setIsMobile] = useState(false)
-    const dispatch = useDispatch()
-    const authenticated = useSelector(isAuthenticated)
+const Navbar = () => {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false)
+    const location = useLocation()
 
-    // Check if screen is mobile
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768)
-        }
-
-        checkMobile()
-        window.addEventListener('resize', checkMobile)
-        return () => window.removeEventListener('resize', checkMobile)
-    }, [])
-
-    const closeMobileSheet = () => setIsMobileSheetOpen(false)
     const toggleDesktopSidebar = () => {
-        const newState = !isDesktopCollapsed
-        setIsDesktopCollapsed(newState)
+        const newState = !isDesktopSidebarCollapsed
+        setIsDesktopSidebarCollapsed(newState)
 
-        // Dispatch custom event to inform Layout component
+        // Dispatch custom event for Layout component
         window.dispatchEvent(new CustomEvent('sidebarToggle', {
             detail: { isCollapsed: newState }
         }))
     }
 
-    const handleLogout = () => {
-        dispatch(logout())
-        if (isMobile) {
-            closeMobileSheet()
-        }
-    }
-
     const navigationItems = [
-        {
-            title: "All Notes",
-            icon: FileText,
-            href: "/",
-            active: true
-        },
-        {
-            title: "Archived",
-            icon: Archive,
-            href: "/archived",
-            active: false
-        }
+        { name: 'Dashboard', href: '/', icon: Home },
+        { name: 'Notes', href: '/notes', icon: FileText },
+        { name: 'Create Note', href: '/notes/create', icon: Plus },
     ]
 
-    const SidebarContent = ({ isMobileSheet = false, isCollapsed = false }) => (
-        <div className="flex h-full flex-col bg-background">
-            {/* Header */}
-            <div className="border-b px-6 py-4 flex items-center justify-between">
-                {!isCollapsed && (
-                    <Link
-                        to="/"
-                        className="text-lg font-semibold"
-                        onClick={isMobileSheet ? closeMobileSheet : undefined}
-                    >
-                        Notedly
-                    </Link>
-                )}
-
-                {/* Desktop collapse toggle */}
-                {!isMobileSheet && (
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={toggleDesktopSidebar}
-                        className="h-8 w-8 p-0"
-                    >
-                        {isCollapsed ? (
-                            <ChevronRight className="h-4 w-4" />
-                        ) : (
-                            <ChevronLeft className="h-4 w-4" />
-                        )}
-                    </Button>
-                )}
-            </div>
-
-            {/* Navigation */}
-            <div className="flex-1 overflow-y-auto py-4">
-                <nav className="space-y-1 px-3">
-                    {authenticated ? (
-                        <>
-                            {navigationItems.map((item) => {
-                                const Icon = item.icon
-                                return (
-                                    <Link
-                                        key={item.title}
-                                        to={item.href}
-                                        onClick={isMobileSheet ? closeMobileSheet : undefined}
-                                        className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${item.active
-                                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                                            } ${isCollapsed ? 'justify-center' : ''}`}
-                                        title={isCollapsed ? item.title : undefined}
-                                    >
-                                        <Icon className="h-4 w-4 flex-shrink-0" />
-                                        {!isCollapsed && <span>{item.title}</span>}
-                                    </Link>
-                                )
-                            })}
-
-                            {/* Pinned Section */}
-                            {!isCollapsed && (
-                                <div className="mt-6">
-                                    <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                        Pinned
-                                    </h3>
-                                </div>
-                            )}
-
-                            {/* Tags Section */}
-                            {!isCollapsed && (
-                                <div className="mt-6">
-                                    <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                        Tags
-                                    </h3>
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <div className="space-y-2">
-                            <Link
-                                to="/login"
-                                onClick={isMobileSheet ? closeMobileSheet : undefined}
-                                className={`block rounded-md px-3 py-2 text-sm border-2 border-black text-center font-medium hover:bg-accent hover:text-accent-foreground ${isCollapsed ? 'px-2' : ''
-                                    }`}
-                            >
-                                {isCollapsed ? 'L' : 'Login'}
-                            </Link>
-                            <Link
-                                to="/signup"
-                                onClick={isMobileSheet ? closeMobileSheet : undefined}
-                                className={`block rounded-md px-3 py-2 text-sm text-center border-black border-2 font-medium hover:bg-accent hover:text-accent-foreground ${isCollapsed ? 'px-2' : ''
-                                    }`}
-                            >
-                                {isCollapsed ? 'S' : 'Sign Up'}
-                            </Link>
-                        </div>
-                    )}
-                </nav>
-            </div>
-
-            {/* Footer with Logout and Mode Toggle */}
-            <div className="border-t p-3">
-                <div className={`flex items-center ${isCollapsed ? 'flex-col gap-2' : 'justify-between'}`}>
-                    {authenticated ? (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleLogout}
-                            className={`flex items-center gap-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 ${isCollapsed ? 'w-8 h-8 p-0' : ''
-                                }`}
-                            title={isCollapsed ? 'Logout' : undefined}
-                        >
-                            <LogOut className="h-4 w-4" />
-                            {!isCollapsed && <span>Logout</span>}
-                        </Button>
-                    ) : (
-                        <div></div>
-                    )}
-                    <ModeToggle />
-                </div>
-            </div>
-        </div>
-    )
+    const isActive = (href) => {
+        if (href === '/') {
+            return location.pathname === '/'
+        }
+        return location.pathname.startsWith(href)
+    }
 
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className={`hidden md:flex md:flex-col md:fixed md:inset-y-0 bg-background border-r transition-all duration-300 ${isDesktopCollapsed ? 'md:w-16' : 'md:w-64'
+            <aside className={`fixed left-0 top-0 z-50 h-screen bg-card border-r transition-all duration-300 hidden md:block ${isDesktopSidebarCollapsed ? 'w-16' : 'w-64'
                 }`}>
-                <SidebarContent isCollapsed={isDesktopCollapsed} />
+                <div className="flex h-full flex-col">
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-4 border-b">
+                        {!isDesktopSidebarCollapsed && (
+                            <h2 className="text-lg font-semibold">Notes App</h2>
+                        )}
+                        <button
+                            onClick={toggleDesktopSidebar}
+                            className="p-2 rounded-md hover:bg-accent"
+                        >
+                            <Menu className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Navigation */}
+                    <nav className="flex-1 p-4 space-y-2">
+                        {navigationItems.map((item) => {
+                            const Icon = item.icon
+                            return (
+                                <Link
+                                    key={item.name}
+                                    to={item.href}
+                                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(item.href)
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                                        }`}
+                                    title={isDesktopSidebarCollapsed ? item.name : ''}
+                                >
+                                    <Icon className="w-5 h-5 flex-shrink-0" />
+                                    {!isDesktopSidebarCollapsed && (
+                                        <span className="ml-3">{item.name}</span>
+                                    )}
+                                </Link>
+                            )
+                        })}
+                    </nav>
+                </div>
             </aside>
 
-            {/* Mobile Header with Menu Button */}
-            <header className="md:hidden flex items-center justify-between p-4 border-b bg-background">
-                <Link to="/" className="text-lg font-semibold">
-                    Notedly
-                </Link>
-
-                <div className="flex items-center gap-2">
-                    <ModeToggle />
-                    <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
-                        <SheetTrigger asChild>
-                            <Button variant="outline" size="icon">
-                                <Menu className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent side="left" className="w-64 p-0">
-                            <SidebarContent isMobileSheet={true} />
-                        </SheetContent>
-                    </Sheet>
+            {/* Mobile Header */}
+            <header className="fixed top-0 left-0 right-0 z-50 bg-card border-b md:hidden">
+                <div className="flex items-center justify-between p-4">
+                    <h1 className="text-lg font-semibold">Notes App</h1>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="p-2 rounded-md hover:bg-accent"
+                    >
+                        {isMobileMenuOpen ? (
+                            <X className="w-5 h-5" />
+                        ) : (
+                            <Menu className="w-5 h-5" />
+                        )}
+                    </button>
                 </div>
             </header>
 
-            {/* Main Content Area Spacer for Desktop */}
-            <div className={`hidden md:block md:flex-shrink-0 transition-all duration-300 ${isDesktopCollapsed ? 'md:w-16' : 'md:w-64'
-                }`}>
-            </div>
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && (
+                <div className="fixed inset-0 z-40 md:hidden">
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
+                    <div className="fixed top-16 left-0 right-0 bg-card border-b shadow-lg">
+                        <nav className="p-4 space-y-2">
+                            {navigationItems.map((item) => {
+                                const Icon = item.icon
+                                return (
+                                    <Link
+                                        key={item.name}
+                                        to={item.href}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(item.href)
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                                            }`}
+                                    >
+                                        <Icon className="w-5 h-5 mr-3" />
+                                        {item.name}
+                                    </Link>
+                                )
+                            })}
+                        </nav>
+                    </div>
+                </div>
+            )}
         </>
     )
 }
+
+export default Navbar

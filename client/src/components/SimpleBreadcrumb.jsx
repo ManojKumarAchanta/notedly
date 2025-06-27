@@ -1,84 +1,50 @@
-// components/SimpleBreadcrumb.jsx
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { useSelector, useDispatch } from "react-redux";
-import { setActiveView } from "@/app/features/uiSlice";
-import { Home, FileText, Plus, Edit } from "lucide-react";
+import React from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { ChevronRight, Home } from 'lucide-react'
 
 const SimpleBreadcrumb = () => {
-    const activeView = useSelector((state) => state.ui.activeView);
-    const dispatch = useDispatch();
+    const location = useLocation()
+    const pathnames = location.pathname.split('/').filter((x) => x)
 
-    const handleNavigation = (view) => {
-        dispatch(setActiveView(view));
-    };
-
-    const getBreadcrumbConfig = () => {
-        switch (activeView) {
-            case "list":
-                return {
-                    items: [
-                        { label: "Home", icon: Home, current: true }
-                    ]
-                };
-            case "create":
-                return {
-                    items: [
-                        { label: "Home", icon: Home, view: "list" },
-                        { label: "Create Note", icon: Plus, current: true }
-                    ]
-                };
-            case "edit":
-                return {
-                    items: [
-                        { label: "Home", icon: Home, view: "list" },
-                        { label: "Edit Note", icon: Edit, current: true }
-                    ]
-                };
-            default:
-                return {
-                    items: [
-                        { label: "Home", icon: Home, current: true }
-                    ]
-                };
-        }
-    };
-
-    const { items } = getBreadcrumbConfig();
+    const breadcrumbNameMap = {
+        '': 'Dashboard',
+        'notes': 'Notes',
+        'create': 'Create',
+        'edit': 'Edit'
+    }
 
     return (
-        <Breadcrumb className="mb-6">
-            <BreadcrumbList>
-                {items.map((item, index) => (
-                    <div key={index} className="flex items-center">
-                        <BreadcrumbItem>
-                            {item.current ? (
-                                <BreadcrumbPage className="flex items-center gap-2">
-                                    <item.icon className="h-4 w-4" />
-                                    {item.label}
-                                </BreadcrumbPage>
-                            ) : (
-                                <BreadcrumbLink
-                                    className="flex items-center gap-2 cursor-pointer"
-                                    onClick={() => handleNavigation(item.view)}
-                                >
-                                    <item.icon className="h-4 w-4" />
-                                    {item.label}
-                                </BreadcrumbLink>
-                            )}
-                        </BreadcrumbItem>
-                        {index < items.length - 1 && <BreadcrumbSeparator />}
-                    </div>
-                ))}
-            </BreadcrumbList>
-        </Breadcrumb>
-    );
-};
+        <nav className="flex items-center space-x-1 text-sm text-muted-foreground mb-6">
+            <Link
+                to="/"
+                className="flex items-center hover:text-foreground transition-colors"
+            >
+                <Home className="w-4 h-4" />
+            </Link>
 
-export default SimpleBreadcrumb;
+            {pathnames.map((name, index) => {
+                const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`
+                const isLast = index === pathnames.length - 1
+                const displayName = breadcrumbNameMap[name] || name
+
+                return (
+                    <React.Fragment key={name}>
+                        <ChevronRight className="w-4 h-4" />
+                        {isLast ? (
+                            <span className="text-foreground font-medium">{displayName}</span>
+                        ) : (
+                            <Link
+                                to={routeTo}
+                                className="hover:text-foreground transition-colors"
+                            >
+                                {displayName}
+                            </Link>
+                        )}
+                    </React.Fragment>
+                )
+            })}
+        </nav>
+    )
+}
+
+export default SimpleBreadcrumb

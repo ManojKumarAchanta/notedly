@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import { useRef, useEffect } from "react";
 import { SaveIcon, CalendarIcon, UserIcon, TagIcon, XIcon, PlusIcon } from "lucide-react";
 import { LoaderCircle } from "lucide-react";
-import { setActiveView } from "@/app/features/uiSlice";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

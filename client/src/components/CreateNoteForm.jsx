@@ -7,8 +7,7 @@ import { SaveIcon } from "lucide-react";
 import { LoaderCircle } from "lucide-react";
 import { PlusCircle } from "lucide-react";
 import { PlusSquareIcon } from "lucide-react";
-import { setActiveView } from "@/app/features/uiSlice";
-import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import SimpleTags from "./SimpleTags";
@@ -27,7 +26,6 @@ export default function CreateNoteForm() {
     // State to manage the content of the TinyMCE editor
     const titleRef = useRef(null);
     const editorRef = useRef(null);
-    const dispatch = useDispatch();
     const handleEnhanceNoteWithAI = async () => {
         try {
             const res = await enhanceNoteWithAI({ note: editorRef.current.getContent() });
@@ -49,6 +47,7 @@ export default function CreateNoteForm() {
             console.error("Error enhancing note with AI:", error);
         }
     };
+    const navigate = useNavigate();
     const handleCreateNote = async () => {
         // Validate title
         if (!titleRef.current?.value?.trim()) {
@@ -90,7 +89,7 @@ export default function CreateNoteForm() {
             // Clear the form after successful save
             editorRef.current.setContent("");
             titleRef.current.value = "";
-            dispatch(setActiveView("list")); // Navigate back to the list view after saving
+            navigate("/notes"); // Redirect to the home page or notes list
 
         } catch (error) {
             console.error("Error saving note:", error);

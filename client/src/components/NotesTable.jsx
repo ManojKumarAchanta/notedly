@@ -42,15 +42,12 @@ import {
 } from "../app/services/notesApi";
 import { useEffect } from "react";
 import { PlusIcon } from "lucide-react";
-import { setActiveView } from "@/app/features/uiSlice";
-import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
 export default function NotesTable() {
     const [search, setSearch] = useState("");
     const [selectedNotes, setSelectedNotes] = useState(new Set());
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const {
         data: apiData,
@@ -394,7 +391,7 @@ export default function NotesTable() {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => dispatch(setActiveView('create'))}
+                            onClick={() => navigate("/notes/create")}
                         >
                             Create <PlusIcon className="w-4 h-4 ml-1" />
                         </Button>

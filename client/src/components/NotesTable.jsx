@@ -433,6 +433,9 @@ export default function NotesTable() {
                                         <div className="flex flex-col items-center justify-center text-center">
                                             <div className="text-muted-foreground mb-2 text-sm">
                                                 {search ? "No notes found matching your search." : "No notes found."}
+                                                <Button onClick={() => dispatch(setActiveView('create'))} className="ml-2">
+                                                    Create a Note
+                                                </Button>
                                             </div>
                                             {search && (
                                                 <Button

@@ -69,7 +69,7 @@ const SimpleTags = ({ tags, setTags }) => {
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
                             placeholder={tags.length === 0 ? "Add tags (comma separated or press Enter)..." : "Add more tags..."}
-                            className="w-full border-none outline-none bg-transparent text-sm placeholder-gray-400"
+                            className="w-full border-none outline-none text-sm text-black placeholder-gray-400"
                         />
                     </div>
                 </div>

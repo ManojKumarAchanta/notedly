@@ -38,10 +38,8 @@ function Signup({ onSwitchToLogin }) {
             await signup(sanitizedData).unwrap();
             toast.success('Signup successful! Please login to continue.');
         } catch (err) {
-            // Extract error message properly
-            let errorMessage = err;
-
-            toast.error(errorMessage.message);
+            console.log(err)
+            toast.error(err.data.error);
             console.error('Signup failed:', err);
         }
     };

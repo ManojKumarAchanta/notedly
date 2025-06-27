@@ -1,10 +1,23 @@
 import React from 'react'
+import Layout from './Layout'
+import { Route, Routes } from 'react-router-dom'
+import AuthContainer from './pages/auth/AuthContainer'
+import Home from './pages/Home'
+import ProtectedRoute from './components/ProtectedRoute'
+import PublicRoute from './components/PublicRoute'
 
 const App = () => {
   return (
-    <div>
-      <h1 className='text-red-500 text-2xl'>King</h1>
-    </div>
+    <Layout>
+      <Routes>
+        <Route path="/*" element={<ProtectedRoute>
+          <Home />
+        </ProtectedRoute>} />
+        <Route path="/auth" element={<PublicRoute>
+          <AuthContainer />
+        </PublicRoute>} />
+      </Routes>
+    </Layout>
   )
 }
 

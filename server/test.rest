@@ -1,9 +1,9 @@
 ### GET request
-GET https://localhost:3000/api/signup
+GET https://localhost:3000/api/auth/signup
 Accept: application/json
 
 ### POST request with JSON
-POST http://localhost:5000/api/signup
+POST http://localhost:5000/api/auth/signup
 Content-Type: application/json
 
 {
@@ -33,3 +33,19 @@ Content-Type: application/json
 
 ### DELETE request
 DELETE https://jsonplaceholder.typicode.com/posts/1
+
+
+### POST request with form data
+POST http://localhost:5000/api/note/create
+Content-Type: application/json
+
+{
+  title: "New Note",
+  content: "This is the content of the new note.",
+  tags: ["tag1", "tag2"]
+}
+
+### GET request
+GET http://localhost:8000/api/note/notes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODVkMjM4NDA4ZjM1ZmRlNTNjZWUxZTUiLCJpYXQiOjE3NTA5NDUwNTYsImV4cCI6MTc1MDk1MjI1Nn0.dVrR6iWBx6GNmhBTqyHwgTnMjObis8PNNrLQ_7p6BZ4
+

@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const notesApi = createApi({
   reducerPath: "notesApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://notedly-4ml6.onrender.com/api/note",
+    baseUrl: "https://notedly-server.vercel.app/api/note",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       if (token) {

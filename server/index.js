@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://notedly-two.vercel.app", "http://localhost:5173"],
+    origin: ["https://notedly-delta.vercel.app", "http://localhost:5173"],
     credentials: true,
   })
 );

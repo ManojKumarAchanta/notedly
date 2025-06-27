@@ -39,7 +39,7 @@ function Signup({ onSwitchToLogin }) {
             toast.success('Signup successful! Please login to continue.');
         } catch (err) {
             console.log(err)
-            toast.error(err.data.error);
+            toast.error(err.data.message || 'Signup failed. Please try again.');
             console.error('Signup failed:', err);
         }
     };

@@ -21,7 +21,7 @@ import { PenIcon } from "lucide-react"
 import { NotebookPenIcon } from "lucide-react"
 
 const LeftSide = () => (
-    <div className="flex flex-col  hidden md:block justify-center px-10 py-16 text-foreground">
+    <div className="flex items-center hidden md:block justify-center px-10 py-16 text-foreground">
         <h1 className="text-4xl font-semibold flex items-center gap-2 text-primary mb-4">
             Notedly
             <NotebookPenIcon className="w-8 h-8 text-primary" />
@@ -68,7 +68,7 @@ function Login({ onSwitchToSignup }) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen bg-background text-foreground">
+        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen bg-background align-center place-content-center text-foreground">
             {/* Left Side */}
             <LeftSide />
             {/* Right Side - Form */}

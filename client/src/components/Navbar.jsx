@@ -5,10 +5,14 @@ import { ModeToggle } from './mode-toggle'
 import { useDispatch } from 'react-redux'
 import { logout } from '@/app/features/authSlice'
 import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
+import { LogIn } from 'lucide-react'
+import { UserPlus2 } from 'lucide-react'
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false)
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
     const location = useLocation()
     const navigate = useNavigate()
 
@@ -38,10 +42,13 @@ const Navbar = () => {
         // Redirect to auth page
     }
 
-    const navigationItems = [
+    const navigationItems = isAuthenticated ? [
         { name: 'Dashboard', href: '/', icon: Home },
         { name: 'Notes', href: '/notes', icon: FileText },
         { name: 'Create Note', href: '/notes/create', icon: Plus },
+    ] : [
+        { name: 'Login', href: '/auth', icon: LogIn },
+        { name: 'Register', href: '/auth', icon: UserPlus2 },
     ]
 
     const isActive = (href) => {
@@ -104,16 +111,19 @@ const Navbar = () => {
                         </div>
 
                         {/* Logout Button */}
-                        <button
-                            onClick={handleLogout}
-                            className="flex items-center w-full px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                            title={isDesktopSidebarCollapsed ? 'Logout' : ''}
-                        >
-                            <LogOut className="w-5 h-5 flex-shrink-0" />
-                            {!isDesktopSidebarCollapsed && (
-                                <span className="ml-3">Logout</span>
-                            )}
-                        </button>
+                        {
+                            isAuthenticated ? (
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center w-full px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                                    title={isDesktopSidebarCollapsed ? 'Logout' : ''}
+                                >
+                                    <LogOut className="w-5 h-5 flex-shrink-0" />
+                                    {!isDesktopSidebarCollapsed && (
+                                        <span className="ml-3">Logout</span>
+                                    )}
+                                </button>) : ""
+                        }
                     </div>
                 </div>
             </aside>
@@ -124,16 +134,20 @@ const Navbar = () => {
                     <h1 className="text-lg font-semibold">Notes App</h1>
                     <div className="flex items-center space-x-2">
                         <ModeToggle />
-                        <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 rounded-md hover:bg-accent"
-                        >
-                            {isMobileMenuOpen ? (
-                                <X className="w-5 h-5" />
-                            ) : (
-                                <Menu className="w-5 h-5" />
-                            )}
-                        </button>
+                        {
+                            isAuthenticated ? (
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                    className="p-2 rounded-md hover:bg-accent"
+                                >
+                                    {isMobileMenuOpen ? (
+                                        <X className="w-5 h-5" />
+                                    ) : (
+                                        <Menu className="w-5 h-5" />
+                                    )}
+                                </button>
+                            ) : ""
+                        }
                     </div>
                 </div>
             </header>
@@ -163,7 +177,7 @@ const Navbar = () => {
                             })}
 
                             {/* Mobile Logout Button */}
-                            <button
+                            {isAuthenticated ? <button
                                 onClick={() => {
                                     setIsMobileMenuOpen(false)
                                     handleLogout()
@@ -172,7 +186,7 @@ const Navbar = () => {
                             >
                                 <LogOut className="w-5 h-5 mr-3" />
                                 Logout
-                            </button>
+                            </button> : ""}
                         </nav>
                     </div>
                 </div>

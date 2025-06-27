@@ -98,13 +98,13 @@ export const pinUnpinNote = async (req, res) => {
     note.isPinned = !note.isPinned;
     note.updatedAt = new Date();
     await note.save();
-    res.json({
+    return res.json({
       message: `Note ${note.isPinned ? "pinned" : "unpinned"} successfully`,
-      note,
+      isPinned: note.isPinned,
     });
   } catch (err) {
     console.error("Pin note error:", err);
-    res.status(500).json({ error: "Failed to pin note" });
+    return res.status(500).json({ error: "Failed to pin note" });
   }
 };
 

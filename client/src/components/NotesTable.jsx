@@ -100,6 +100,7 @@ export default function NotesTable() {
     const handleTogglePin = async (note) => {
         try {
             const result = await togglePin(note._id).unwrap();
+            console.log(result)
             toast.success(result.isPinned ? "Note pinned!" : "Note unpinned!");
         } catch (error) {
             console.error('Pin toggle error:', error);

@@ -54,6 +54,7 @@ function Login({ onSwitchToSignup }) {
         const { email, password } = formData;
         try {
             const response = await login({ email, password }).unwrap();
+            console.log('Login Response:', response);
             dispatch(setCredentials({ token: response.token, user: response.user }));
             toast.success('Login successful!');
             // Redirect or perform any other action after successful login
@@ -263,9 +264,6 @@ function Signup({ onSwitchToLogin }) {
                             <div className="flex flex-col gap-2">
                                 <Button onClick={handleSubmit} className="w-full">
                                     {!isLoading ? "Create Account" : <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                                </Button>
-                                <Button type="button" variant="outline" className="w-full">
-                                    Sign up with Google
                                 </Button>
                             </div>
                         </div>

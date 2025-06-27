@@ -54,7 +54,7 @@ export default function Navbar() {
         {
             title: "All Notes",
             icon: FileText,
-            href: "/dashboard",
+            href: "/",
             active: true
         },
         {

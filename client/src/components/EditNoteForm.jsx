@@ -13,11 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { selectCurrentUser } from "@/app/features/authSlice";
+import { useSelector } from "react-redux";
 
 export default function EditNoteForm() {
     // Extract note ID from URL path (e.g., /notes/685e1f1247dd5453e002dd28)
+    const user = useSelector(selectCurrentUser);
     const noteId = window.location.pathname.split('/').pop();
-
     const [updateNote, { isLoading: isUpdating }] = useUpdateNoteMutation();
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -129,7 +131,6 @@ export default function EditNoteForm() {
             </div>
         );
     }
-
     // Show error state if note fetch failed
     if (error) {
         return (
@@ -160,7 +161,6 @@ export default function EditNoteForm() {
             </div>
         );
     }
-
     return (
         <div className="w-full mx-auto py-4 md:px-6 max-w-6xl">
             {/* Header with metadata */}
@@ -181,7 +181,7 @@ export default function EditNoteForm() {
                             <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-2">
                                     <UserIcon className="w-4 h-4" />
-                                    <span>Author: {noteData.userId}</span>
+                                    <span>Author: {user?.username || 'User'}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <CalendarIcon className="w-4 h-4" />

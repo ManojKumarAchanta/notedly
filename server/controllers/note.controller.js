@@ -51,7 +51,7 @@ ${note}
     });
   } catch (error) {
     console.error("Gemini Error:", error.message);
-    res.status(500).json({ error: "Failed to sanitize note." });
+    res.status(500).json({ error: "Failed to sanitize note.", error });
   }
 };
 

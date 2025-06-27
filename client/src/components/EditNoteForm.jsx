@@ -8,6 +8,7 @@ import { LoaderCircle } from "lucide-react";
 import { setActiveView } from "@/app/features/uiSlice";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,11 @@ export default function EditNoteForm() {
     const [color, setColor] = useState("#ffffff");
     const editorRef = useRef(null);
     const dispatch = useDispatch();
-
+    const navigate = useNavigate();
+    if (!noteId) {
+        console.error("Note ID is not provided in the URL.");
+        navigate("/"); // or handle this case appropriately
+    }
     const handleEnhanceNoteWithAI = async () => {
         try {
             // Get current content from TinyMCE editor

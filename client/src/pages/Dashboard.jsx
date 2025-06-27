@@ -4,8 +4,11 @@
 import React from 'react'
 import SimpleBreadcrumb from '@/components/SimpleBreadcrumb'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '@/app/features/authSlice'
 
 const Dashboard = () => {
+    const user = useSelector(selectCurrentUser);
     return (
         <div className='w-full h-full'>
             <SimpleBreadcrumb />
@@ -13,7 +16,7 @@ const Dashboard = () => {
             <main className="space-y-6">
                 <div>
                     <h1 className="text-3xl font-bold">Dashboard</h1>
-                    <p className="text-muted-foreground">Welcome to your notes application</p>
+                    <p className="text-muted-foreground">Welcome {user.username}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -31,7 +31,7 @@ export default function CreateNoteForm() {
     const handleEnhanceNoteWithAI = async () => {
         try {
             const res = await enhanceNoteWithAI({ note: editorRef.current.getContent() });
-            console.log(res);
+            // console.log(res);
             //get value of html from data getting from useEnhanceNoteWithAIQuery
             const html = res.data?.html;
             if (!html) {
@@ -74,7 +74,7 @@ export default function CreateNoteForm() {
         }
 
         try {
-            console.log("Creating note with:", { content, title: titleRef.current.value });
+            // console.log("Creating note with:", { content, title: titleRef.current.value });
 
             await createNote({
                 content,

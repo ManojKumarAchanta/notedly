@@ -1,0 +1,141 @@
+import { useSignupMutation } from "@/app/services/authApi";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import LeftSide from "./LeftSide";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+
+
+function Signup({ onSwitchToLogin }) {
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    })
+
+    const [signup, { isLoading }] = useSignupMutation();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        // Basic validation
+        if (formData.password !== formData.confirmPassword) {
+            alert("Passwords don't match!")
+            return
+        }
+        const sanitizedData = {
+            email: formData.email,
+            password: formData.password,
+            username: formData.username
+        }
+
+        try {
+            await signup(sanitizedData).unwrap();
+            toast.success('Signup successful! Please login to continue.');
+            onSwitchToLogin(); // Switch to login after successful signup
+        } catch (err) {
+            toast.error('Signup failed. Please try again.');
+            // Optionally log the error for debugging
+            console.error('Signup failed:', err);
+        }
+    };
+
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value })
+    }
+
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen bg-background flex item-center text-foreground">
+            {/* Left Side */}
+
+            <LeftSide />
+            <div className="flex items-center justify-center w-full min-h-screen p-4">
+                <Card className="w-full max-w-md ">
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-2xl">Welcome to Notedly</CardTitle>
+                        <CardDescription>
+                            Create your account to get started.
+                        </CardDescription>
+                        <div className="pt-2">
+                            <span className="text-sm text-muted-foreground">
+                                Already have an account?{" "}
+                            </span>
+                            <Button
+                                variant="link"
+                                className="p-0 h-auto font-normal text-sm"
+                                onClick={onSwitchToLogin}
+                            >
+                                Login
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-6">
+                            <div className="flex flex-col gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="username">Username</Label>
+                                    <Input
+                                        id="username"
+                                        name="username"
+                                        type="text"
+                                        placeholder="johndoe"
+                                        value={formData.username}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="signup-email">Email</Label>
+                                    <Input
+                                        id="signup-email"
+                                        name="email"
+                                        type="email"
+                                        placeholder="m@example.com"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="signup-password">Password</Label>
+                                    <Input
+                                        id="signup-password"
+                                        name="password"
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                                    <Input
+                                        id="confirm-password"
+                                        name="confirmPassword"
+                                        type="password"
+                                        placeholder="Confirm your password"
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Button onClick={handleSubmit} className="w-full">
+                                    {!isLoading ? "Create Account" : <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                                </Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+
+    )
+}
+
+// Main component to switch between Login and Signup
+export default Signup;

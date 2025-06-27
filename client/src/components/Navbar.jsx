@@ -33,7 +33,7 @@ const Navbar = () => {
             dispatch(logout());
             toast.success('Logged out successfully!')
             localStorage.removeItem('authToken')
-            navigate('/auth')
+            navigate('/auth/login')
         } catch (error) {
             toast.error('Logout failed. Please try again.')
             console.error('Logout failed:', error);
@@ -47,8 +47,8 @@ const Navbar = () => {
         { name: 'Notes', href: '/notes', icon: FileText },
         { name: 'Create Note', href: '/notes/create', icon: Plus },
     ] : [
-        { name: 'Login', href: '/auth', icon: LogIn },
-        { name: 'Register', href: '/auth', icon: UserPlus2 },
+        { name: 'Login', href: '/auth/login', icon: LogIn },
+        { name: 'Register', href: '/auth/signup', icon: UserPlus2 },
     ]
 
     const isActive = (href) => {

@@ -2,7 +2,6 @@
 import React from 'react'
 import Layout from './Layout'
 import { Route, Routes } from 'react-router-dom'
-import AuthContainer from './pages/auth/AuthContainer'
 import Dashboard from './pages/Dashboard'
 import NotesPage from './pages/NotesPage'
 import CreateNotePage from './pages/CreateNotePage'
@@ -10,16 +9,27 @@ import EditNotePage from './pages/EditNotePage'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
 import { Navigate } from 'react-router-dom'
+import Login from './pages/auth/Login'
+import Signup from './pages/auth/Signup'
+
 
 const App = () => {
   return (
     <Layout>
       <Routes>
         <Route
-          path="/auth"
+          path="/auth/signup"
           element={
             <PublicRoute>
-              <AuthContainer />
+              <Signup />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/auth/login"
+          element={
+            <PublicRoute>
+              <Login />
             </PublicRoute>
           }
         />

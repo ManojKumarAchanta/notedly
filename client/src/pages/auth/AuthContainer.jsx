@@ -132,9 +132,8 @@ function Login({ onSwitchToSignup }) {
                                 <Button type="submit" className="w-full">
                                     {!isLoading ? "Login" : <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                                 </Button>
-                                <Button type="button" variant="outline" className="w-full">
-                                    Login with Google
-                                </Button>
+
+
                             </div>
                         </form>
                     </CardContent>

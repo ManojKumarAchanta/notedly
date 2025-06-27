@@ -16,8 +16,6 @@ import { useState } from "react"
 import toast from "react-hot-toast"
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from "react-redux"
-import { NotebookIcon } from "lucide-react"
-import { PenIcon } from "lucide-react"
 import { NotebookPenIcon } from "lucide-react"
 
 const LeftSide = () => (
@@ -60,6 +58,7 @@ function Login({ onSwitchToSignup }) {
             // Redirect or perform any other action after successful login
             navigate('/'); // Assuming you have a navigate function from react-router-dom
         } catch (err) {
+            toast.error('Login failed. Please check your credentials.');
             console.error('Login failed:', err);
         }
     }

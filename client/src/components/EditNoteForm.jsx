@@ -1,6 +1,6 @@
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import { useGetNoteQuery, useUpdateNoteMutation } from "@/app/services/notesApi";
+import { useEnhanceNoteWithAIMutation, useGetNoteQuery, useUpdateNoteMutation } from "@/app/services/notesApi";
 import toast from "react-hot-toast";
 import { useRef, useEffect } from "react";
 import { SaveIcon, CalendarIcon, UserIcon, TagIcon, XIcon, PlusIcon } from "lucide-react";
@@ -15,10 +15,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { selectCurrentUser } from "@/app/features/authSlice";
 import { useSelector } from "react-redux";
+import { WandSparkles } from "lucide-react";
+
+function cleanModelOutput(dirtyHtml) {
+    return dirtyHtml
+        .replace(/```html\s*/i, "") // remove starting ```html
+        .replace(/```$/, "") // remove ending ```
+        .trim();
+}
 
 export default function EditNoteForm() {
     // Extract note ID from URL path (e.g., /notes/685e1f1247dd5453e002dd28)
     const user = useSelector(selectCurrentUser);
+    const [enhanceNoteWithAI, { isLoading: isEnhancing }] = useEnhanceNoteWithAIMutation();
     const noteId = window.location.pathname.split('/').pop();
     const [updateNote, { isLoading: isUpdating }] = useUpdateNoteMutation();
     const [title, setTitle] = useState("");
@@ -28,6 +37,42 @@ export default function EditNoteForm() {
     const [color, setColor] = useState("#ffffff");
     const editorRef = useRef(null);
     const dispatch = useDispatch();
+
+    const handleEnhanceNoteWithAI = async () => {
+        try {
+            // Get current content from TinyMCE editor
+            const currentContent = editorRef.current ? editorRef.current.getContent() : content;
+
+            if (!currentContent || currentContent.trim() === '' || currentContent.trim() === '<p></p>') {
+                toast.error("Please write some content before enhancing with AI.");
+                return;
+            }
+
+            const res = await enhanceNoteWithAI({ note: currentContent });
+            console.log(res);
+
+            // Get value of html from data
+            const html = res.data?.html;
+            if (!html) {
+                toast.error("Failed to enhance note with AI. Please try again.");
+                return;
+            }
+
+            // Set the content of the TinyMCE editor to the enhanced HTML
+            const cleanedHtml = cleanModelOutput(html);
+            if (editorRef.current) {
+                editorRef.current.setContent(cleanedHtml);
+            }
+            // Also update the state
+            setContent(cleanedHtml);
+
+            toast.success("Note enhanced with AI successfully!");
+
+        } catch (error) {
+            toast.error("Failed to enhance note with AI. Please try again.");
+            console.error("Error enhancing note with AI:", error);
+        }
+    };
 
     // Fetch note data when component mounts
     const { data: noteData, error, isLoading: isFetching } = useGetNoteQuery(noteId, {
@@ -85,11 +130,14 @@ export default function EditNoteForm() {
                 return;
             }
 
+            // Get the latest content from the editor
+            const currentContent = editorRef.current ? editorRef.current.getContent() : content;
+
             // Check if content is empty
-            const isContentEmpty = !content ||
-                content.trim() === '' ||
-                content.trim() === '<p><br></p>' ||
-                content.trim() === '<p></p>';
+            const isContentEmpty = !currentContent ||
+                currentContent.trim() === '' ||
+                currentContent.trim() === '<p><br></p>' ||
+                currentContent.trim() === '<p></p>';
 
             if (isContentEmpty) {
                 toast.error("Please write some content for your note.");
@@ -101,12 +149,12 @@ export default function EditNoteForm() {
                 return;
             }
 
-            console.log("Updating note with:", { id: noteId, title, content, tags, color });
+            console.log("Updating note with:", { id: noteId, title, content: currentContent, tags, color });
 
             await updateNote({
                 id: noteId,
                 title: title.trim(),
-                content,
+                content: currentContent,
                 tags,
                 color,
             }).unwrap();
@@ -131,6 +179,7 @@ export default function EditNoteForm() {
             </div>
         );
     }
+
     // Show error state if note fetch failed
     if (error) {
         return (
@@ -161,6 +210,7 @@ export default function EditNoteForm() {
             </div>
         );
     }
+
     return (
         <div className="w-full mx-auto py-4 md:px-6 max-w-6xl">
             {/* Header with metadata */}
@@ -211,40 +261,60 @@ export default function EditNoteForm() {
                 {/* Main Content Area */}
                 <div className="lg:col-span-3">
                     {/* Title Input */}
-                    <div className="mb-4">
+                    <div className="mb-4 flex items-center gap-[5%] justify-between">
                         <Input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Enter note title..."
-                            className="text-lg font-semibold"
+                            className="text-lg font-semibold flex-1"
                             required
                         />
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={handleEnhanceNoteWithAI}
+                                className="px-3 py-2 sm:px-4 sm:py-2 rounded text-sm sm:text-base transition-colors duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isEnhancing}
+                                variant="outline"
+                            >
+                                {isEnhancing ? (
+                                    <span className="flex items-center gap-1 sm:gap-2">
+                                        <LoaderCircle className="animate-spin w-4 h-4 sm:w-5 sm:h-5" />
+                                        <span className="hidden sm:inline">Enhancing...</span>
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-1 sm:gap-2">
+                                        <WandSparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        <span className="hidden sm:inline">Enhance with AI</span>
+                                        <span className="sm:hidden">AI</span>
+                                    </span>
+                                )}
+                            </Button>
+                            <Button
+                                onClick={handleUpdateNote}
+                                disabled={isUpdating}
+                                size="sm"
+                            >
+                                {isUpdating ? (
+                                    <>
+                                        <LoaderCircle className="animate-spin w-4 h-4 mr-2" />
+                                        <span className="hidden sm:inline">Updating...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="hidden sm:inline mr-2">Update Note</span>
+                                        <SaveIcon className="w-4 h-4" />
+                                    </>
+                                )}
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Editor Container */}
-                    <div className="relative w-full">
-                        <Button
-                            onClick={handleUpdateNote}
-                            className="absolute z-50 right-2 top-2 sm:right-4 sm:top-4"
-                            disabled={isUpdating}
-                            size="sm"
-                        >
-                            {isUpdating ? (
-                                <>
-                                    <LoaderCircle className="animate-spin w-4 h-4 mr-2" />
-                                    <span className="hidden sm:inline">Updating...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="hidden sm:inline mr-2">Update Note</span>
-                                    <SaveIcon className="w-4 h-4" />
-                                </>
-                            )}
-                        </Button>
-
+                    <div className="flex w-full gap-2 items-center justify-center">
                         <div className="w-full">
                             <Editor
+                                onInit={(evt, editor) => editorRef.current = editor}
                                 value={content}
                                 onEditorChange={(newContent) => setContent(newContent)}
                                 className="w-full min-h-[500px] border rounded-lg"

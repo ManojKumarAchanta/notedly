@@ -1,5 +1,60 @@
 import Note from "../models/note.model.js";
 
+import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+dotenv.config();
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+export const enhanceNoteWithAI = async (req, res) => {
+  const { note } = req.body;
+
+  if (!req.user || !req.user.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!note) {
+    return res.status(400).json({ error: "Note is required" });
+  }
+
+  const prompt = `
+I am building a note-taking application. Users can write notes in a text area, but many of them contain grammar and spelling mistakes, inconsistent formatting, and poor structure.
+
+Please:
+1. Correct all grammar and spelling errors.
+2. Organize the content clearly using proper structure (paragraphs, headings, lists, etc.).
+3. Return the improved note as clean HTML using tags like <h1>, <p>, <ul>, <li>, etc.
+4. Do not change the meaning of the content — just improve readability and structure.
+5. Do not include anything other than the final HTML code.
+6. Return ONLY the cleaned HTML as plain text — DO NOT wrap it inside \`\`\`html or any markdown.
+---
+
+Raw Note:
+${note}
+`;
+
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const html = response.text();
+
+    if (!html) {
+      return res.status(500).json({ error: "Failed to generate HTML" });
+    }
+
+    res.json({
+      message: "Note sanitized and enhanced successfully",
+      html,
+    });
+  } catch (error) {
+    console.error("Gemini Error:", error.message);
+    res.status(500).json({ error: "Failed to sanitize note." });
+  }
+};
+
 export const createNote = async (req, res) => {
   try {
     const { title, content, tags, isPinned, isArchived, color } = req.body;
@@ -105,7 +160,7 @@ export const getArchivedNotes = async (req, res) => {
 export const deleteManyNotes = async (req, res) => {
   try {
     const { noteIds } = req.body; // Expecting an array of note IDs to
-    console.log(noteIds)
+    console.log(noteIds);
     if (!Array.isArray(noteIds) || noteIds.length === 0) {
       return res.status(400).json({ error: "Invalid note IDs" });
     }

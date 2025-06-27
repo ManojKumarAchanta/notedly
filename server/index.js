@@ -5,7 +5,7 @@ import userRouter from "./routes/user.router.js";
 import noteRouter from "./routes/note.route.js";
 import cors from "cors";
 import { protect } from "./middleware/auth.middleware.js";
-dotenv.config();
+dotenv.config({ path: "./.env" });
 
 const port = process.env.PORT;
 const app = express();

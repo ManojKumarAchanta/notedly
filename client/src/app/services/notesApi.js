@@ -4,6 +4,7 @@ export const notesApi = createApi({
   reducerPath: "notesApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://notedly-4ml6.onrender.com/api/note",
+    // baseUrl: "http://localhost:8000/api/note",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       if (token) {
@@ -88,10 +89,19 @@ export const notesApi = createApi({
       }),
       invalidatesTags: ["Note"],
     }),
+    enhanceNoteWithAI: builder.mutation({
+      query: (note) => ({
+        url: "/enhance",
+        method: "POST",
+        body: note,
+      }),
+      invalidatesTags: ["Note"],
+    }),
   }),
 });
 
 export const {
+  useEnhanceNoteWithAIMutation,
   useGetNotesQuery,
   useUpdateNoteMutation,
   useDeleteNoteMutation,

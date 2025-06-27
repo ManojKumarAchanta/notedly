@@ -4,6 +4,7 @@ import {
   createNote,
   deleteManyNotes,
   deleteNote,
+  enhanceNoteWithAI,
   getArchivedNotes,
   getNote,
   getPinnedNotes,
@@ -20,6 +21,7 @@ noteRouter.get("/getarchives", getArchivedNotes);
 noteRouter.get("/getpinned", getPinnedNotes);
 
 noteRouter.post("/create", createNote);
+noteRouter.post("/enhance", enhanceNoteWithAI);
 
 noteRouter.put("/update/:id", updateNote);
 noteRouter.put("/togglepin/:id", pinUnpinNote);

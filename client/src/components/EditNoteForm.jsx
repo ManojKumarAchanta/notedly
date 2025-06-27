@@ -25,11 +25,10 @@ function cleanModelOutput(dirtyHtml) {
         .trim();
 }
 
-export default function EditNoteForm() {
+export default function EditNoteForm({ noteId }) {
     // Extract note ID from URL path (e.g., /notes/685e1f1247dd5453e002dd28)
     const user = useSelector(selectCurrentUser);
     const [enhanceNoteWithAI, { isLoading: isEnhancing }] = useEnhanceNoteWithAIMutation();
-    const noteId = window.location.pathname.split('/').pop();
     const [updateNote, { isLoading: isUpdating }] = useUpdateNoteMutation();
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");

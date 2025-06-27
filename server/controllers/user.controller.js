@@ -59,3 +59,57 @@ export const logout = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error", error });
   }
 };
+
+export async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "No user found!", success: true });
+    }
+    const emailRes = await sendEmail({
+      email,
+      emailType: "RESET",
+      userId: user._id,
+    });
+    console.log("Email Response: ", emailRes);
+
+    return res
+      .status(200)
+      .json({ emailRes, message: "Email sent successfully.", success: "true" });
+  } catch (error) {
+    console.log("Error in forgot password route: sending email failed", error);
+    return res
+      .status(500)
+      .json({ error: "Error in seding forgot password email" + error });
+  }
+}
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.query;
+    const { password } = req.body;
+    console.log(token, password);
+    const user = await User.findOne({
+      forgotPasswordToken: token,
+      forgotPasswordTokenExpiry: { $gt: Date.now() },
+    }); // Check if the token is not expired });
+    if (!user) {
+      return res.status(400).json({ message: "no user found" });
+    }
+    //update password
+    //hash password and replace old password with new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.forgotPasswordToken = undefined; // Remove the token from the user document
+    user.forgotPasswordTokenExpiry = undefined; // Remove the token expiry from the user document
+    await user.save(); // Save the updated user document
+
+    // If the user is found and verified, send a success response
+    return res
+      .status(200)
+      .json({ message: "Reset password successfull", success: true });
+  } catch (error) {
+    console.log("Error in reset password route:", error);
+    return res.status(200).json({ error: "Error resetting password " });
+  }
+};

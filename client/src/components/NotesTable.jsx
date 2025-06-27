@@ -220,8 +220,7 @@ export default function NotesTable() {
     };
 
     const handleEdit = (note) => {
-        dispatch(setActiveView('edit'));
-        navigate(`/notes/${note._id}`);
+        navigate(`/notes/edit/${note._id}`);
     };
 
     const toggleSelectNote = (noteId) => {

@@ -10,8 +10,24 @@ const App = () => {
   return (
     <Layout>
       <Routes>
-        <Route path="/auth" element={<PublicRoute><AuthContainer /></PublicRoute>} />
-        <Route path="/*" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route
+          path="/auth"
+          element={
+            <PublicRoute>
+              <AuthContainer />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        {/* Catch all wrong routes and redirect to "/" */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
   )

@@ -5,6 +5,7 @@ import AuthContainer from './pages/auth/AuthContainer'
 import Home from './pages/Home'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
+import { Navigate } from 'react-router-dom'
 
 const App = () => {
   return (

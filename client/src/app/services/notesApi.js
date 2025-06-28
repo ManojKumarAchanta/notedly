@@ -3,8 +3,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const notesApi = createApi({
   reducerPath: "notesApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://notedly-4ml6.onrender.com/api/note",
-    // baseUrl: "http://localhost:8000/api/note",
+    // baseUrl: "https://notedly-4ml6.onrender.com/api/note",
+    baseUrl: "http://localhost:8000/api/note",
     prepareHeaders: (headers, { endpoint }) => {
       const token = localStorage.getItem("token");
       if (token) {

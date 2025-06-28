@@ -12,7 +12,6 @@ import cloudinary from "../config/cloudinary.js";
 export const createNote = async (req, res) => {
   try {
     const { title, content, tags, isPinned, isArchived, color } = req.body;
-    console.log(req.user.userId);
 
     const newNote = new Note({
       userId: req.user.userId,
@@ -24,11 +23,10 @@ export const createNote = async (req, res) => {
       color,
     });
 
-    // Handle file uploads if they exist
     if (req.files && req.files.length > 0) {
       newNote.attachments = req.files.map((file) => ({
         filename: file.originalname,
-        url: file.path, // Cloudinary URL
+        url: file.path,
         size: file.size,
         mimeType: file.mimetype,
       }));
@@ -37,10 +35,21 @@ export const createNote = async (req, res) => {
     await newNote.save();
     res.status(201).json(newNote);
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({
+        error: "Duplicate Title",
+        message: `Note with the title "${err.keyValue.title}" already exists. Please choose a different title.`,
+      });
+    }
+
     console.error("Create note error:", err);
-    res.status(500).json({ error: "Failed to create note" });
+    res.status(500).json({
+      error: "Failed to create note",
+      message: err.message,
+    });
   }
 };
+
 
 export const updateNote = async (req, res) => {
   try {
@@ -309,7 +318,7 @@ export const deleteNote = async (req, res) => {
 export const addAttachments = async (req, res) => {
   try {
     const noteId = req.params.id;
-    
+
     const note = await Note.findOne({ _id: noteId, userId: req.user.userId });
     if (!note) {
       return res.status(404).json({ error: "Note not found" });
@@ -329,7 +338,7 @@ export const addAttachments = async (req, res) => {
     // Add new attachments to existing ones
     note.attachments = [...(note.attachments || []), ...newAttachments];
     note.updatedAt = new Date();
-    
+
     await note.save();
     res.json(note);
   } catch (err) {

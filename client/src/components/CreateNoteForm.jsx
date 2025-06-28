@@ -112,8 +112,17 @@ export default function CreateNoteForm() {
             navigate("/notes");
         } catch (error) {
             console.error("Error saving note:", error);
-            toast.error("Failed to save note. Please try again.");
+
+            if (
+                error?.data?.error === "Duplicate Title" ||
+                error?.message?.includes("duplicate key error")
+            ) {
+                toast.error("A note with this title already exists. Please use a different title.");
+            } else {
+                toast.error("Failed to save note. Please try again.");
+            }
         }
+
     };
     const [selectedFiles, setSelectedFiles] = useState([]);
 

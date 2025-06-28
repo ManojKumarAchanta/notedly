@@ -165,7 +165,7 @@ export default function EditNoteForm({ noteId }) {
 
         } catch (error) {
             console.error("Error updating note:", error);
-            toast.error("Failed to update note. Please try again.");
+            toast.error(error.message);
         }
     };
 

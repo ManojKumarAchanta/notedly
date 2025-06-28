@@ -309,18 +309,12 @@ export const getNote = async (req, res) => {
 import mongoose from "mongoose";
 
 export const getNotes = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid note ID format" });
-  }
-
   try {
     const notes = await Note.find({ userId: req.user.userId }).sort({
       updatedAt: -1,
     });
-    if (!note) return res.status(404).json({ error: "Note not found" });
-    res.json(note);
+    if (!notes) return res.status(404).json({ error: "Note not found" });
+    res.json(notes);
   } catch (err) {
     console.error("Get note error:", err);
     res.status(500).json({ error: "Failed to get note", message: err.message });

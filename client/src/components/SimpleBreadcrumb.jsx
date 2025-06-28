@@ -10,7 +10,9 @@ const SimpleBreadcrumb = () => {
         '': 'Dashboard',
         'notes': 'Notes',
         'create': 'Create',
-        'edit': 'Edit'
+        'edit': 'Edit',
+        'view': 'View',
+        'categories': 'Categories',
     }
 
     return (

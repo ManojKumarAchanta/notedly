@@ -44,6 +44,8 @@ import { useEffect } from "react";
 import { PlusIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { File } from "lucide-react";
+import { EyeClosed } from "lucide-react";
+import { Eye } from "lucide-react";
 
 export default function NotesTable() {
     const [search, setSearch] = useState("");
@@ -95,7 +97,8 @@ export default function NotesTable() {
     );
 
     // Enhanced togglePin function with proper RTK Query mutation
-    const handleTogglePin = async (note) => {
+    const handleTogglePin = async (note, event) => {
+        event.stopPropagation(); // Prevent row click
         try {
             const result = await togglePin(note._id).unwrap();
             console.log(result)
@@ -107,7 +110,8 @@ export default function NotesTable() {
     };
 
     // Enhanced toggleArchive function with proper RTK Query mutation
-    const handleToggleArchive = async (note) => {
+    const handleToggleArchive = async (note, event) => {
+        event.stopPropagation(); // Prevent row click
         try {
             const result = await toggleArchive(note._id).unwrap();
             toast.success(result.isArchived ? "Note archived!" : "Note unarchived!");
@@ -117,7 +121,8 @@ export default function NotesTable() {
         }
     };
 
-    const handleDelete = async (noteId) => {
+    const handleDelete = async (noteId, event) => {
+        event.stopPropagation(); // Prevent row click
         try {
             await deleteNote(noteId).unwrap();
             toast.success("Note deleted successfully!");
@@ -218,11 +223,13 @@ export default function NotesTable() {
         }
     };
 
-    const handleEdit = (note) => {
+    const handleEdit = (note, event) => {
+        event.stopPropagation(); // Prevent row click
         navigate(`/notes/edit/${note._id}`);
     };
 
-    const toggleSelectNote = (noteId) => {
+    const toggleSelectNote = (noteId, event) => {
+        event.stopPropagation(); // Prevent row click
         setSelectedNotes(prev => {
             const newSet = new Set(prev);
             if (newSet.has(noteId)) {
@@ -240,6 +247,10 @@ export default function NotesTable() {
         } else {
             setSelectedNotes(new Set(filteredNotes.map(note => note._id)));
         }
+    };
+
+    const handleRowClick = (noteId) => {
+        navigate(`/notes/${noteId}`);
     };
 
     if (isLoading) {
@@ -419,7 +430,6 @@ export default function NotesTable() {
                                 <TableHead className="w-16 font-medium text-center hidden md:table-cell py-2 text-sm">Pin</TableHead>
                                 <TableHead className="w-20 font-medium text-center hidden lg:table-cell py-2 text-sm">Archive</TableHead>
                                 <TableHead className="w-14 font-medium text-center hidden xl:table-cell py-2 text-sm">Color</TableHead>
-                                {/* <TableHead className="w-14 font-medium text-center hidden xl:table-cell py-2 text-sm">Attatchments</TableHead> */}
                                 <TableHead className="w-20 font-medium hidden lg:table-cell py-2 text-sm">Created</TableHead>
                                 <TableHead className="w-28 font-medium text-right pr-3 py-2 text-sm">Actions</TableHead>
                             </TableRow>
@@ -450,17 +460,18 @@ export default function NotesTable() {
                             {filteredNotes.map((note) => (
                                 <TableRow
                                     key={note._id}
-                                    className={`hover:bg-muted/50 transition-colors h-12 ${selectedNotes.has(note._id) ? 'bg-muted/30' : ''
+                                    className={`hover:bg-muted/50 transition-colors h-12 cursor-pointer ${selectedNotes.has(note._id) ? 'bg-muted/30' : ''
                                         } ${note.isPinned ? 'bg-blue-50/30 dark:bg-blue-950/20' : ''
                                         } ${note.isArchived ? 'opacity-60' : ''
                                         }`}
+                                    onClick={() => handleRowClick(note._id)}
                                 >
                                     {/* Checkbox */}
                                     <TableCell className="pl-3 py-2">
                                         <input
                                             type="checkbox"
                                             checked={selectedNotes.has(note._id)}
-                                            onChange={() => toggleSelectNote(note._id)}
+                                            onChange={(e) => toggleSelectNote(note._id, e)}
                                             className="rounded border-input w-3.5 h-3.5"
                                         />
                                     </TableCell>
@@ -538,11 +549,7 @@ export default function NotesTable() {
                                             <Dot className="h-14 w-14" style={{ color: note.color }} />
                                         </div>
                                     </TableCell>
-                                    {/* <TableCell className="text-center hidden xl:table-cell py-2">
-                                        <div className="flex justify-center">
-                                            <File className="h-4 w-4" />  {note.attachments?.length || 0}
-                                        </div>
-                                    </TableCell> */}
+
                                     {/* Created Date - Hidden on smaller screens */}
                                     <TableCell className="text-xs text-muted-foreground hidden lg:table-cell py-2">
                                         {note.createdAt ? new Date(note.createdAt).toLocaleDateString('en-US', {
@@ -563,7 +570,18 @@ export default function NotesTable() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleTogglePin(note)}
+                                                    onClick={() => navigate("/notes/view/" + note._id)}
+                                                    className="h-7 w-7 p-0 hover:bg-muted"
+                                                >
+
+                                                    <Eye
+                                                        className="h-3.5 w-3.5" />
+
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={(e) => handleTogglePin(note, e)}
                                                     className="h-7 w-7 p-0 hover:bg-muted"
                                                     title={note.isPinned ? "Unpin note" : "Pin note"}
                                                 >
@@ -577,7 +595,7 @@ export default function NotesTable() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleToggleArchive(note)}
+                                                    onClick={(e) => handleToggleArchive(note, e)}
                                                     className="h-7 w-7 p-0 hover:bg-muted"
                                                     title={note.isArchived ? "Unarchive note" : "Archive note"}
                                                 >
@@ -593,7 +611,7 @@ export default function NotesTable() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => handleEdit(note)}
+                                                onClick={(e) => handleEdit(note, e)}
                                                 className="h-7 w-7 p-0 hover:bg-muted"
                                                 title="Edit note"
                                             >
@@ -606,6 +624,7 @@ export default function NotesTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
+                                                        onClick={(e) => e.stopPropagation()}
                                                         className="h-7 w-7 p-0 hover:bg-muted"
                                                         title="Delete note"
                                                     >
@@ -622,7 +641,7 @@ export default function NotesTable() {
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                         <AlertDialogAction
-                                                            onClick={() => handleDelete(note._id)}
+                                                            onClick={(e) => handleDelete(note._id, e)}
                                                             className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
                                                         >
                                                             Delete
@@ -636,7 +655,7 @@ export default function NotesTable() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleTogglePin(note)}
+                                                    onClick={(e) => handleTogglePin(note, e)}
                                                     className="h-7 w-7 p-0 hover:bg-muted"
                                                 >
                                                     {note.isPinned ? (
@@ -649,7 +668,7 @@ export default function NotesTable() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => handleToggleArchive(note)}
+                                                    onClick={(e) => handleToggleArchive(note, e)}
                                                     className="h-7 w-7 p-0 hover:bg-muted"
                                                 >
                                                     {note.isArchived ? (

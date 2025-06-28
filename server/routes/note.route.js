@@ -30,7 +30,7 @@ noteRouter.get("/notes/categories/:categoryId", filterNotesByCategory); // Make 
 noteRouter.get("/getarchives", getArchivedNotes);
 noteRouter.get("/getpinned", getPinnedNotes);
 noteRouter.get("/categories", getAllCategories);
-noteRouter.get("/note/:id", getNote); // Put this last among GETs
+noteRouter.get("/:id", getNote); // Put this last among GETs
 
 // POST routes
 noteRouter.post("/create-category", createCategory);

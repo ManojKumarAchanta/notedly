@@ -3,8 +3,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const notesApi = createApi({
   reducerPath: "notesApi",
   baseQuery: fetchBaseQuery({
-    // baseUrl: "https://notedly-4ml6.onrender.com/api/note",
-    baseUrl: "http://localhost:8000/api/note",
+    baseUrl: "https://notedly-4ml6.onrender.com/api/note",
+    // baseUrl: "http://localhost:8000/api/note",
     prepareHeaders: (headers, { endpoint }) => {
       const token = localStorage.getItem("token");
       if (token) {
@@ -151,10 +151,23 @@ export const notesApi = createApi({
       }),
       invalidatesTags: ["Note"],
     }),
+    getAllCategories: builder.query({
+      query: () => `/categories`,
+      providesTags: (result, error, id) => [{ type: "Category", id }],
+    }),
+    createCategory: builder.mutation({
+      query: (category) => ({
+        url: "/create-category",
+        method: "POST",
+        body: category,
+      }),
+      invalidatesTags: ["Category"],
+    }),
   }),
 });
 
 export const {
+  useCreateCategoryMutation,
   useEnhanceNoteWithAIMutation,
   useGetNotesQuery,
   useUpdateNoteMutation,
@@ -166,6 +179,7 @@ export const {
   useTogglePinMutation, // Changed from Query to Mutation
   useGetArchivesQuery,
   useDeleteManyNotesMutation,
+  useGetAllCategoriesQuery,
   // New attachment hooks
   useAddAttachmentsMutation,
   useRemoveAttachmentMutation,

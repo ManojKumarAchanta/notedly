@@ -13,6 +13,11 @@ const NoteSchema = new mongoose.Schema(
     isPinned: { type: Boolean, default: false },
     isArchived: { type: Boolean, default: false },
     color: { type: String, default: "#ffffff" },
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category", // 👈 reference to Category model
+      default: null,
+    },
     attatchments: [
       {
         filename: String,

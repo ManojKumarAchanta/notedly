@@ -11,10 +11,12 @@ import cloudinary from "../config/cloudinary.js";
 
 export const createNote = async (req, res) => {
   try {
-    const { title, content, tags, isPinned, isArchived, color } = req.body;
+    const { title, content, categoryId, tags, isPinned, isArchived, color } =
+      req.body;
 
     const newNote = new Note({
       userId: req.user.userId,
+      categoryId,
       title,
       content,
       tags,
@@ -50,6 +52,22 @@ export const createNote = async (req, res) => {
   }
 };
 
+// GET /notes?categoryId=abc123
+export const filterNotesByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const query = { userId: req.user.userId };
+
+    if (categoryId !== "all") {
+      query.categoryId = categoryId;
+    }
+
+    const notes = await Note.find(query).populate("categoryId");
+    res.json(notes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 export const updateNote = async (req, res) => {
   try {
@@ -287,14 +305,25 @@ export const getNote = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch note" });
   }
 };
+
+import mongoose from "mongoose";
+
 export const getNotes = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid note ID format" });
+  }
+
   try {
     const notes = await Note.find({ userId: req.user.userId }).sort({
       updatedAt: -1,
     });
-    res.json(notes);
+    if (!note) return res.status(404).json({ error: "Note not found" });
+    res.json(note);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch notes" });
+    console.error("Get note error:", err);
+    res.status(500).json({ error: "Failed to get note", message: err.message });
   }
 };
 

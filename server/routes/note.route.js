@@ -12,19 +12,28 @@ import {
   updateNote,
   removeAttachment,
   addAttachments,
+  filterNotesByCategory,
 } from "../controllers/note.controller.js";
 import { getNotes } from "../controllers/note.controller.js";
 import upload from "../middleware/cloudinaryUpload.js"; // Your multer-cloudinary config
+import {
+  createCategory,
+  getAllCategories,
+} from "../controllers/category.controller.js";
 
 const noteRouter = Router();
 
 // GET routes
+// GET routes
 noteRouter.get("/notes", getNotes);
-noteRouter.get("/:id", getNote);
+noteRouter.get("/notes/categories/:categoryId", filterNotesByCategory); // Make this more specific
 noteRouter.get("/getarchives", getArchivedNotes);
 noteRouter.get("/getpinned", getPinnedNotes);
+noteRouter.get("/categories", getAllCategories);
+noteRouter.get("/notes/:id", getNote); // Put this last among GETs
 
 // POST routes
+noteRouter.post("/create-category", createCategory);
 noteRouter.post("/create", upload.array("attachments", 5), createNote);
 noteRouter.post("/enhance", enhanceNoteWithAI);
 noteRouter.post(

@@ -39,6 +39,14 @@ const Dashboard = () => {
                         <h3 className="text-xl font-semibold mb-2">Create Note</h3>
                         <p className="text-muted-foreground">Add a new note</p>
                     </Link>
+                    <Link
+                        to="/categories"
+                        className="p-6 border rounded-lg hover:shadow-md transition-shadow"
+                    >
+                        <h3 className="text-xl font-semibold mb-2">Manage Categories</h3>
+                        <p className="text-muted-foreground">Create, edit, or delete your note categories</p>
+                    </Link>
+
                 </div>
             </main>
         </div>

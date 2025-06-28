@@ -11,6 +11,7 @@ import PublicRoute from './components/PublicRoute'
 import { Navigate } from 'react-router-dom'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
+import CategoriesPage from './pages/CategoriesPage'
 
 
 const App = () => {
@@ -62,6 +63,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <EditNotePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/categories"
+          element={
+            <ProtectedRoute>
+              <CategoriesPage />
             </ProtectedRoute>
           }
         />

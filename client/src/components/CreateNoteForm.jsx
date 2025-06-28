@@ -3,6 +3,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { useCreateNoteMutation, useEnhanceNoteWithAIMutation } from "@/app/services/notesApi";
 import toast from "react-hot-toast";
 import { useRef } from "react";
+import { Wrench } from "lucide-react";
 import { SaveIcon } from "lucide-react";
 import { LoaderCircle } from "lucide-react";
 import { PlusCircle } from "lucide-react";
@@ -114,8 +115,39 @@ export default function CreateNoteForm() {
             toast.error("Failed to save note. Please try again.");
         }
     };
-    const [selectedFiles, setSelectedFiles] = useState([]);      
-    const FileUploadSection = () => {
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+    function FileIcon(props) {
+        return (
+            <svg
+                {...props}
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+            </svg>
+        )
+    }
+
+    // Helper function to format file size
+    const formatFileSize = (bytes) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    function FileUploadSection() {
+        const [selectedFiles, setSelectedFiles] = useState([]);
         const fileInputRef = useRef(null);
 
         const handleFileChange = (e) => {
@@ -129,58 +161,66 @@ export default function CreateNoteForm() {
         };
 
         return (
-            <Card className="mb-4">
-                <CardHeader>
-                    <CardTitle className="text-lg">Attachments (Optional)</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <Input
-                        ref={fileInputRef}
-                        type="file"
-                        multiple
-                        accept="image/*,application/pdf,video/*,audio/*,.doc,.docx,.txt"
-                        onChange={handleFileChange}
-                    />
+            <div className="relative mb-4">
+                {/* In Development Overlay */}
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-[12px] z-10 rounded-lg flex items-center justify-center">
+                    <div className="bg-transparent bg-yellow-40 border-2 border-yellow-300 rounded-lg p-6 shadow-lg max-w-md text-center">
+                        <Wrench className="w-12 h-12 text-yellow-600 mx-auto mb-3" />
+                        <h3 className="text-lg font-semibold text-yellow-800 mb-2">Feature In Development</h3>
+                        <p className="text-sm text-yellow-700">
+                            File upload functionality is currently being developed and will be available soon.
+                        </p>
+                    </div>
+                </div>
 
-                    {selectedFiles.length > 0 && (
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium">
-                                Selected Files ({selectedFiles.length})
-                            </Label>    
-                            <div className="space-y-2 max-h-32 overflow-y-auto">
-                                {selectedFiles.map((file, index) => (
-                                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                                            <FileIcon className="w-4 h-4" />
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate">{file.name}</p>
-                                                <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                {/* Faded Content */}
+                <div className="opacity-30 pointer-events-none">
+                    <Card className="mb-4">
+                        <CardHeader>
+                            <CardTitle className="text-lg">Attachments (Optional)</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <Input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                accept="image/*,application/pdf,video/*,audio/*,.doc,.docx,.txt"
+                                onChange={handleFileChange}
+                            />
+
+                            {selectedFiles.length > 0 && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">
+                                        Selected Files ({selectedFiles.length})
+                                    </Label>
+                                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                                        {selectedFiles.map((file, index) => (
+                                            <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                    <FileIcon className="w-4 h-4" />
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-medium truncate">{file.name}</p>
+                                                        <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => removeFile(index)}
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </Button>
                                             </div>
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => removeFile(index)}
-                                        >
-                                            <XIcon className="w-4 h-4" />
-                                        </Button>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         );
-    };
-    // Helper function to add to your CreateNote component
-    const formatFileSize = (bytes) => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    };
+    }
     return (
         <div className="grid grid-cols-1 md:grid-cols-[75%_25%] min-h-screen bg-background align-center place-content-center text-foreground">
             <div className="w-full mx-auto py-6 md:px-6">

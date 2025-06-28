@@ -419,7 +419,7 @@ export default function NotesTable() {
                                 <TableHead className="w-16 font-medium text-center hidden md:table-cell py-2 text-sm">Pin</TableHead>
                                 <TableHead className="w-20 font-medium text-center hidden lg:table-cell py-2 text-sm">Archive</TableHead>
                                 <TableHead className="w-14 font-medium text-center hidden xl:table-cell py-2 text-sm">Color</TableHead>
-                                <TableHead className="w-14 font-medium text-center hidden xl:table-cell py-2 text-sm">Attatchments</TableHead>
+                                {/* <TableHead className="w-14 font-medium text-center hidden xl:table-cell py-2 text-sm">Attatchments</TableHead> */}
                                 <TableHead className="w-20 font-medium hidden lg:table-cell py-2 text-sm">Created</TableHead>
                                 <TableHead className="w-28 font-medium text-right pr-3 py-2 text-sm">Actions</TableHead>
                             </TableRow>
@@ -538,11 +538,11 @@ export default function NotesTable() {
                                             <Dot className="h-14 w-14" style={{ color: note.color }} />
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center hidden xl:table-cell py-2">
+                                    {/* <TableCell className="text-center hidden xl:table-cell py-2">
                                         <div className="flex justify-center">
                                             <File className="h-4 w-4" />  {note.attachments?.length || 0}
                                         </div>
-                                    </TableCell>
+                                    </TableCell> */}
                                     {/* Created Date - Hidden on smaller screens */}
                                     <TableCell className="text-xs text-muted-foreground hidden lg:table-cell py-2">
                                         {note.createdAt ? new Date(note.createdAt).toLocaleDateString('en-US', {

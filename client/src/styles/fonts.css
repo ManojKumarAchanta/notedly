@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'Aileron';
+    src: url('/fonts/aileron/Aileron-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Aileron';
+    src: url('/fonts/aileron/Aileron-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Aileron';
+    src: url('/fonts/aileron/Aileron-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  

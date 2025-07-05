@@ -14,8 +14,7 @@
 *   **🔐 Protected Routes:** Secure access to your notes and personal information.
 
 ## 🚀 Live Demo
-
-[Link to your live application URL]
+https://notedly-delta.vercel.app
 
 ## 🛠️ Tech Stack
 
@@ -96,16 +95,18 @@ The application will be available at `http://localhost:3000`.
 ## Screenshots
 
 **Dashboard**
+![image](https://github.com/user-attachments/assets/a7936c86-3d07-4b5e-8659-09bd19b3a07d)
 
-![Dashboard](https://i.imgur.com/your-screenshot-1.png)
 
 **Notes Page**
 
-![Notes Page](https://i.imgur.com/your-screenshot-2.png)
+![image](https://github.com/user-attachments/assets/be1e345e-36c4-4d5b-84a6-87a8794b4cb2)
+
 
 **Create Note Page**
 
-![Create Note Page](https://i.imgur.com/your-screenshot-3.png)
+![image](https://github.com/user-attachments/assets/86837e6a-d3ab-4e34-9895-4bb78d2ae8bc)
+
 
 ## 🤝 Contributing
 
